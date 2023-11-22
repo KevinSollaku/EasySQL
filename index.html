@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore Tabella SQL</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Genera Tabella SQL</h1>
+        <div>
+            <label for="tableName">Nome Tabella:</label>
+            <input type="text" id="tableName" placeholder="Inserisci il nome della tabella">
+        </div>
+        <table id="tabellaAttributi">
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Lunghezza</th>
+                <th>Nullo</th>
+                <th>Chiave Primaria</th>
+                <th>Univoco</th>
+                <th>Rimuovi</th>
+            </tr>
+        </table>
+        <button id="aggiungiRiga">Aggiungi Attributo</button>
+        <textarea id="codice" readonly></textarea>
+        <button id="esporta">Esporta SQL</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
