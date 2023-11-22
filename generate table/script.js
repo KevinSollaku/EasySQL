@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function(){
             } else{
                 nomi.add(name);
     
-                if(/^\d+$/.test(name)){
+                if(!(/^[a-zA-Z0-9]*$/.test(name))){
                     alert('il nome degli attributi non può essere composto solo da numeri.');
                     input.value= '';
                 }
