@@ -13,7 +13,7 @@ function generaDomanda(difficolta) {
     const tab1=dividiSQL(str1);
     const tab2=dividiSQL(str2);
     const tab3=dividiSQL(str3);
-
+    console.log(tab1);
     if(difficolta=='facile'){
         document.getElementById('generatedQuestion').value= domandaFacile(tab1, tab2, tab3);
     }
@@ -21,27 +21,43 @@ function generaDomanda(difficolta) {
 
 
 function dividiSQL(codiceSQL) {
-    if(!codiceSQL) return;
+    if (!codiceSQL) return;
 
     const sqlPulito = codiceSQL.replace(/\s+/g, ' ').trim();
     const indiceInizio = sqlPulito.indexOf('(');
     const indiceFine = sqlPulito.lastIndexOf(')');
     const dettagliTabella = sqlPulito.substring(indiceInizio + 1, indiceFine).trim();
     const righe = dettagliTabella.split(',');
-    
+
     const infoTabella = {
         nomeTabella: sqlPulito.match(/CREATE TABLE (\w+)/)[1],
-        campi: []
+        campi: [],
+        foreignKeys: []
     };
 
     righe.forEach(riga => {
-        const [nomeCampo, tipoCampo] = riga.trim().split(' ');
+        const [nomeCampo, tipoCampo, ...resto] = riga.trim().split(' ');
+
+        const foreignKeyRegex = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/;
+        const match = riga.match(foreignKeyRegex);
+
+        if (match) {
+            const [, campoForeignKey, tabellaRiferimento, campoRiferimento] = match;
+            
+            infoTabella.foreignKeys.push({
+                campo: campoForeignKey,
+                riferimento: {
+                    tabella: tabellaRiferimento,
+                    campo: campoRiferimento
+                }
+            });
+        }
+
         infoTabella.campi.push({ nome: nomeCampo, tipo: tipoCampo });
     });
 
     return infoTabella;
 }
-
 
 function domandaFacile(t1, t2, t3){
     let vect=[0, 0, 0];
