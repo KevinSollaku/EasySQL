@@ -1,0 +1,51 @@
+body {
+  font-family: 'Ubuntu';
+  background-color: #F4DFC8;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #000000;
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.table-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.table {
+  width: 30%;
+}
+
+textarea {
+  margin-bottom: 10px;
+  border: 1px solid #000000;
+  resize: none;
+}
+
+.buttons button {
+  background-color: #F4BF96;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.buttons button:hover {
+  background-color: #CE5A67;
+}
