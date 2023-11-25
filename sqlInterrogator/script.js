@@ -1,52 +1,53 @@
-const vectCampi=[];
-const vectEsterni=[];
-
+//tab{
+//   campi[]:
+//       nome
+//       tipo
+//   nomeTabella
+//}
 function generaDomanda(difficolta) {
-    vectCampi.length= 0;
-    vectEsterni.length= 0;
-    
+
     const str1 = document.getElementById('table1').value;
     const str2 = document.getElementById('table2').value;
     const str3 = document.getElementById('table3').value;
 
-    dividiSQL(str1);
-    dividiSQL(str2);
-    dividiSQL(str3);
-    console.log(vectEsterni);
-    console.log(vectCampi);
+    const tab1=dividiSQL(str1);
+    const tab2=dividiSQL(str2);
+    const tab3=dividiSQL(str3);
+
+    if(difficolta=='facile'){
+        document.getElementById('generatedQuestion').value= domandaFacile(tab1, tab2, tab3);
+    }
 }
 
-function dividiSQL(stringa){
-    let regex = /CREATE TABLE (\w+)\(([\s\S]+)\);/;
-    let match = stringa.match(regex);
 
-    if (!match) {
-        return null;
-    }
+function dividiSQL(codiceSQL) {
+    if(!codiceSQL) return;
 
-    let nomeTabella = match[1];
-    let campi = match[2].trim().split(/\s*,\s*/);
+    const sqlPulito = codiceSQL.replace(/\s+/g, ' ').trim();
+    const indiceInizio = sqlPulito.indexOf('(');
+    const indiceFine = sqlPulito.lastIndexOf(')');
+    const dettagliTabella = sqlPulito.substring(indiceInizio + 1, indiceFine).trim();
+    const righe = dettagliTabella.split(',');
+    
+    const infoTabella = {
+        nomeTabella: sqlPulito.match(/CREATE TABLE (\w+)/)[1],
+        campi: []
+    };
 
-    campi.forEach(campo => {
-        const regexCampo = /`(\w+)`\s+(\w+)/;
-        let campoMatch = campo.match(regexCampo);
-
-        if(campoMatch){
-            let nomeCampo = campoMatch[1];
-            let tipoCampo = campoMatch[2].toUpperCase();
-            vectCampi.push([nomeCampo, tipoCampo, nomeTabella]);
-        }
-        else if(campo.includes('FOREIGN KEY')){
-            const regexForeignKey = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/;
-            const foreignKeyMatch = campo.match(regexForeignKey);
-
-            if (foreignKeyMatch) {
-                const campoInterno = foreignKeyMatch[1];
-                const tabellaEsterna = foreignKeyMatch[2];
-                const campoEsterno = foreignKeyMatch[3];
-                vectEsterni.push([campoInterno, tabellaEsterna, campoEsterno])
-            }
-        }
-        
+    righe.forEach(riga => {
+        const [nomeCampo, tipoCampo] = riga.trim().split(' ');
+        infoTabella.campi.push({ nome: nomeCampo, tipo: tipoCampo });
     });
+
+    return infoTabella;
+}
+
+
+function domandaFacile(t1, t2, t3){
+    let vect=[0, 0, 0];
+    if(t1) vect[0]=1;
+    if(t2) vect[1]=1;
+    if(t3) vect[2]=1;
+
+    
 }
