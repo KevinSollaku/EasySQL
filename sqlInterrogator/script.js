@@ -1,9 +1,17 @@
-//tab{
-//   campi[]:
-//       nome
-//       tipo
-//   nomeTabella
+//obj{
+//  campi[]:
+//      nome,
+//      lunghezza,
+//      tipo
+//  chiaviEsterne[]:
+//      campo,
+//      obj referenza{
+//          campo,
+//          tabella
+//      }
+//  nomeTabella
 //}
+
 function generaDomanda(difficolta) {
 
     const str1 = document.getElementById('table1').value;
@@ -13,12 +21,14 @@ function generaDomanda(difficolta) {
     const tab1=dividiSQL(str1);
     const tab2=dividiSQL(str2);
     const tab3=dividiSQL(str3);
-    console.log(tab1);
-    if(difficolta=='facile'){
-        document.getElementById('generatedQuestion').value= domandaFacile(tab1, tab2, tab3);
-    }
-}
+    console.log(tab1)
+    if(difficolta=='facile')         document.getElementById('generatedQuestion').value= domandaFacile(tab1, tab2, tab3);
+    else if(difficolta=='medio')     document.getElementById('generatedQuestion').value= domandaMedia(tab1, tab2, tab3);
+    else if(difficolta=='difficile') document.getElementById('generatedQuestion').value= domandaDifficile(tab1, tab2, tab3);
+    else document.getElementById('generatedQuestion').value= "sei hacker";
 
+
+}
 
 function dividiSQL(codiceSQL) {
     if (!codiceSQL) return;
@@ -35,15 +45,27 @@ function dividiSQL(codiceSQL) {
         foreignKeys: []
     };
 
+    const paroleProibite = ['UNIQUE', 'PRIMARY', 'FOREIGN', 'CHECK', 'DEFAULT'];
+
+    //mi ammazzo
     righe.forEach(riga => {
         const [nomeCampo, tipoCampo, ...resto] = riga.trim().split(' ');
 
-        const foreignKeyRegex = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/;
-        const match = riga.match(foreignKeyRegex);
+        if (!paroleProibite.some(parola => riga.includes(parola))){
+            const l= tipoCampo.indexOf('(');
+            const campo=tipoCampo[l+1];
+            infoTabella.campi.push({ 
+                nome: nomeCampo,
+                lunghezza: l>0? campo:0,
+                tipo: l>0? tipoCampo:tipoCampo.toUpperCase() 
+            });
+        } 
+        else if(riga.includes('FOREIGN')){
+            const indiceForeignKey = resto.indexOf('FOREIGN');
+            const indiceReferences = resto.indexOf('REFERENCES');
+            const campoForeignKey = resto[indiceForeignKey + 1].slice(1, -1);
+            const [tabellaRiferimento, campoRiferimento] = resto.slice(indiceReferences + 1).join(' ').split('(').map(str => str.trim().replace(')', ''));
 
-        if (match) {
-            const [, campoForeignKey, tabellaRiferimento, campoRiferimento] = match;
-            
             infoTabella.foreignKeys.push({
                 campo: campoForeignKey,
                 riferimento: {
@@ -52,18 +74,61 @@ function dividiSQL(codiceSQL) {
                 }
             });
         }
-
-        infoTabella.campi.push({ nome: nomeCampo, tipo: tipoCampo });
     });
 
     return infoTabella;
 }
 
 function domandaFacile(t1, t2, t3){
-    let vect=[0, 0, 0];
-    if(t1) vect[0]=1;
-    if(t2) vect[1]=1;
-    if(t3) vect[2]=1;
+    const vect = [t1, t2, t3].filter(Boolean);
 
+    const p1=vect[rand(vect.length)];
+    const p2=p1.campi[rand(p1.campi.length)];
+    if(p2.tipo=='INT' || p2.tipo=='FLOAT' || p2.tipo=='DOUBLE'){
+        let h=rand(4); //mettere come val qua caso+1
+        switch(h){
+            case 0:
+                return `visualizza il più ${rand(2)? "grande" : "piccolo"} ${p2.nome} `;
+            case 1: 
+                return `visualizza tutti i ${p2.nome} tra 0 e ${rand(100)}`;
+            case 2:
+                return `visualizza tutti i ${p2.nome}`;
+            case 3:
+                return `visualizza tutti i ${p2.nome} con valore pari a ${rand(100)} `;
+        }
+    }
+    else if(p2.tipo=='VARCHAR' || p2.tipo=='STRING' || p2.tipo=='TEXT'){
+        let h=rand(2);
+        switch(h){
+            case 0:
+                return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} pari a ${generaStringaCasuale(rand(3))}`;
+            case 1:
+                return `visualizza tutti i ${p2.nome}`
+        }
+    }
+    else if(p2.tipo=='DATE' || p2.tipo=='YEAR'){
+        return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} ${rand(2)? "dopo" : "prima"} del ${rand(31)+1}/${rand(12)+1}/${rand(2000)+rand(25)}`;
+    }
+    else return "hai sbagliato qualcosa caro mio";
+        
+}   
+
+function domandaMedia(t1, t2, t3){
+    const vect = [t1, t2, t3].filter(Boolean);
+
+
+}
+
+function rand(max) {
+    return Math.floor(Math.random() * max);
+}
+
+function generaStringaCasuale(lunghezza) {
+    const caratteri = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let stringaCasuale = '';
+
+    for (let i = 0; i < lunghezza+2; i++) stringaCasuale += caratteri.charAt(rand(caratteri.length));
     
+
+    return stringaCasuale;
 }
