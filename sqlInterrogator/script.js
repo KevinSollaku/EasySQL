@@ -3,7 +3,7 @@
 //      nome,
 //      lunghezza,
 //      tipo
-//  chiaviEsterne[]:
+//  foreignKeys[]:
 //      campo,
 //      obj referenza{
 //          campo,
@@ -101,20 +101,41 @@ function domandaFacile(t1, t2, t3){
         let h=rand(2);
         switch(h){
             case 0:
-                return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} pari a ${generaStringaCasuale(rand(3))}`;
+                return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} pari a ${generaStringaCasuale(rand(p1.campi.nome.length))}`;
             case 1:
                 return `visualizza tutti i ${p2.nome}`
         }
     }
     else if(p2.tipo=='DATE' || p2.tipo=='YEAR'){
-        return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} ${rand(2)? "dopo" : "prima"} del ${rand(31)+1}/${rand(12)+1}/${rand(2000)+rand(25)}`;
+        return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} ${rand(2)? "dopo" : "prima"} del ${rand(31)+1}/${rand(12)+1}/${2000+rand(25)}`;
     }
+
     else return "hai sbagliato qualcosa caro mio";
         
 }   
 
-function domandaMedia(t1, t2, t3){
+function domandaMedia(t1, t2, t3){  
     const vect = [t1, t2, t3].filter(Boolean);
+    console.log(vect);
+    if(vect.length<2) return "devi inserire almeno 2 tabelle";
+    const tn0 = vect[0];
+    const tn1 = vect[1];
+    if (tn0.foreignKeys && tn1.campi) {
+        for (const foreignKey of tn0.foreignKeys) {
+            // Verifica se il campo della chiave esterna esiste nei campi di tn1
+            if (!tn1.campi.some(campo => campo.nome === foreignKey.campo)) {
+                return `Il campo ${foreignKey.campo} della chiave esterna in ${tn0.nomeTabella} non esiste in ${tn1.nomeTabella}`;
+            }
+        }
+    } else {
+        return "Le tabelle devono avere foreignKeys e campi definiti";
+    }
+
+    //if(!tn0.foreignKeys.some(l =>{ 
+    //    console.log(l.riferimento.campo, tn1.campi)
+    //    tn1.campi.includes(l.riferimento.campo)
+    //})) return "i campi esterni non coincidono";
+
 
 
 }
