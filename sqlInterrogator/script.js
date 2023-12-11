@@ -21,7 +21,7 @@ function generaDomanda(difficolta) {
     const tab1=dividiSQL(str1);
     const tab2=dividiSQL(str2);
     const tab3=dividiSQL(str3);
-    console.log(tab1)
+
     if(difficolta=='facile')         document.getElementById('generatedQuestion').value= domandaFacile(tab1, tab2, tab3);
     else if(difficolta=='medio')     document.getElementById('generatedQuestion').value= domandaMedia(tab1, tab2, tab3);
     else if(difficolta=='difficile') document.getElementById('generatedQuestion').value= domandaDifficile(tab1, tab2, tab3);
@@ -47,20 +47,23 @@ function dividiSQL(codiceSQL) {
 
     const paroleProibite = ['UNIQUE', 'PRIMARY', 'FOREIGN', 'CHECK', 'DEFAULT'];
 
-    //mi ammazzo
     righe.forEach(riga => {
         const [nomeCampo, tipoCampo, ...resto] = riga.trim().split(' ');
 
-        if (!paroleProibite.some(parola => riga.includes(parola))){
-            const l= tipoCampo.indexOf('(');
-            const campo=tipoCampo[l+1];
-            infoTabella.campi.push({ 
+        if (tipoCampo !== undefined && !paroleProibite.some(parola => riga.includes(parola))) {
+            const l = tipoCampo.indexOf('(');
+
+            let campo = 0;
+            if (l > 0) {
+                campo = tipoCampo[l + 1];
+            }
+
+            infoTabella.campi.push({
                 nome: nomeCampo,
-                lunghezza: l>0? campo:0,
-                tipo: l>0? tipoCampo:tipoCampo.toUpperCase() 
+                lunghezza: l > 0 ? campo : 0,
+                tipo: l > 0 ? tipoCampo : tipoCampo.toUpperCase()
             });
-        } 
-        else if(riga.includes('FOREIGN')){
+        } else if (riga.includes('FOREIGN')) {
             const indiceForeignKey = resto.indexOf('FOREIGN');
             const indiceReferences = resto.indexOf('REFERENCES');
             const campoForeignKey = resto[indiceForeignKey + 1].slice(1, -1);
@@ -78,6 +81,7 @@ function dividiSQL(codiceSQL) {
 
     return infoTabella;
 }
+
 
 function domandaFacile(t1, t2, t3){
     const vect = [t1, t2, t3].filter(Boolean);
@@ -109,35 +113,61 @@ function domandaFacile(t1, t2, t3){
     else if(p2.tipo=='DATE' || p2.tipo=='YEAR'){
         return `visualizza i ${p1.campi[rand(p1.campi.length)].nome} con ${p2.nome} ${rand(2)? "dopo" : "prima"} del ${rand(31)+1}/${rand(12)+1}/${2000+rand(25)}`;
     }
-
-    else return "hai sbagliato qualcosa caro mio";
+    else return "sei hacker";
         
-}   
+}
 
 function domandaMedia(t1, t2, t3){  
     const vect = [t1, t2, t3].filter(Boolean);
     console.log(vect);
     if(vect.length<2) return "devi inserire almeno 2 tabelle";
+    
     const tn0 = vect[0];
     const tn1 = vect[1];
-    if (tn0.foreignKeys && tn1.campi) {
-        for (const foreignKey of tn0.foreignKeys) {
-            // Verifica se il campo della chiave esterna esiste nei campi di tn1
-            if (!tn1.campi.some(campo => campo.nome === foreignKey.campo)) {
-                return `Il campo ${foreignKey.campo} della chiave esterna in ${tn0.nomeTabella} non esiste in ${tn1.nomeTabella}`;
+
+    if(tn1.foreignKeys.length>0) 
+    {
+        let t0=tn0.campi[rand(tn0.campi.length)];
+        let t1=tn1.campi[rand(tn1.campi.length)];
+        if(t0.tipo=="INT" || t0.tipo=='FLOAT' || t0.tipo=='DOUBLE'){
+            let h=rand(2); //mettere come val qua caso+1
+            switch(h){
+                case 0:
+                    return `Visualizza i ${tn1.campi[rand(tn1.campi.length)].nome} con ${t0.nome} uguale a ${t1.nome}`;
+                case 1:
+                    return `altre domande`;
             }
         }
-    } else {
-        return "Le tabelle devono avere foreignKeys e campi definiti";
+        if(t0.tipo=='VARCHAR' || t0.tipo=='STRING' || t0.tipo=='TEXT'){
+
+        }
     }
+    else if(tn0.foreignKeys.length>0){
+        let t0=tn0.campi[rand(tn0.campi.length)];
+        let t1=tn1.campi[rand(tn1.campi.length)];
+        if(t1.tipo=="INT" || t1.tipo=='FLOAT' || t1.tipo=='DOUBLE'){
+            let h=rand(2); //mettere come val qua caso+1
+            switch(h){
+                case 0:
+                    return `Visualizza i ${tn0.campi[rand(tn0.campi.length)].nome} con ${t1.nome} uguale a ${t0.nome}`;
+                case 1:
+                    return `altre domande`;
+            }
+        }
+        if(t1.tipo=='VARCHAR' || t1.tipo=='STRING' || t1.tipo=='TEXT'){
 
-    //if(!tn0.foreignKeys.some(l =>{ 
-    //    console.log(l.riferimento.campo, tn1.campi)
-    //    tn1.campi.includes(l.riferimento.campo)
-    //})) return "i campi esterni non coincidono";
+        }
+    }
+    else return "non ci sono chiavi esterne";
 
+    return "sei hacker";
+}
 
-
+function domandaDifficile(t1, t2, t3){
+    const vect = [t1, t2, t3].filter(Boolean);
+    if(vect.length<3) return "inserisci più tabelle";
+    
+    return "sei hacker";
 }
 
 function rand(max) {
