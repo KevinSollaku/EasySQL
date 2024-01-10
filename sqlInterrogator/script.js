@@ -165,7 +165,49 @@ function domandaMedia(t1, t2, t3){
 
 function domandaDifficile(t1, t2, t3){
     const vect = [t1, t2, t3].filter(Boolean);
-    if(vect.length<3) return "inserisci più tabelle";
+    console.log(vect);
+    if(vect.length<2) return "devi inserire almeno 2 tabelle";
+    
+    const tn0 = vect[0];
+    const tn1 = vect[1];
+    const tn2= vect[2];
+
+    if(tn1.foreignKeys.length>0) 
+    {
+        let t0=tn0.campi[rand(tn0.campi.length)];
+        let t1=tn1.campi[rand(tn1.campi.length)];
+        if(t0.tipo=="INT" || t0.tipo=='FLOAT' || t0.tipo=='DOUBLE'){
+            let h=rand(2); //mettere come val qua caso+1
+            switch(h){
+                case 0:
+                    return `Visualizza i ${tn1.campi[rand(tn2.campi.length)].nome} con ${t0.nome} uguale a ${t1.nome}`;
+                case 1:
+                    return `altre domande`;
+            }
+        }
+        if(t0.tipo=='VARCHAR' || t0.tipo=='STRING' || t0.tipo=='TEXT'){
+
+        }
+    }
+    else if(tn0.foreignKeys.length>0){
+        let t0=tn0.campi[rand(tn0.campi.length)];
+        let t1=tn1.campi[rand(tn1.campi.length)];
+        if(t1.tipo=="INT" || t1.tipo=='FLOAT' || t1.tipo=='DOUBLE'){
+            let h=rand(2); //mettere come val qua caso+1
+            switch(h){
+                case 0:
+                    return `Visualizza i ${tn0.campi[rand(tn0.campi.length)].nome} con ${t2.nome} uguale a ${t0.nome} e ${t1.nome}`;
+                case 1:
+                    return `altre domande`;
+            }
+        }
+        if(t1.tipo=='VARCHAR' || t1.tipo=='STRING' || t1.tipo=='TEXT'){
+
+        }
+    }
+    else return "non ci sono chiavi esterne";
+
+    return "sei hacker";
     
     return "sei hacker";
 }
